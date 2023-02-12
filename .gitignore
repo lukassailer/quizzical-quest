@@ -1,7 +1,19 @@
+# intellij
 .idea
+.idea_modules
 
+# scala
 *.class
 *.log
 
-.bsp
+# sbt
+.bsp/
+.cache/
+.history/
+.lib/
+dist/*
 target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
