@@ -1,32 +1,38 @@
 package quizzical
 
-import japgolly.scalajs.react.ScalaComponent
+import japgolly.scalajs.react.*
+import japgolly.scalajs.react.component.Scala.Component
 import japgolly.scalajs.react.vdom.html_<^.*
 
 object Question {
   case class Props(question: String, answers: List[String])
 
-  val component = ScalaComponent.builder[Props]("Question")
-    .render_P { props =>
+  case class State(selectedAnswer: Option[Int] = None)
+
+  class Backend($: BackendScope[Props, State]) {
+    private def selectAnswer(index: Int): Callback =
+      $.modState(_.copy(selectedAnswer = Some(index)))
+
+    def render(props: Props, state: State): VdomElement = {
       <.div(
         ^.className := "question-box",
         <.p(^.className := "question", props.question),
         <.div(
           ^.className := "answers",
-          <.div(
-            ^.className := "answer", props.answers(0),
-          ),
-          <.div(
-            ^.className := "answer", props.answers(1),
-          ),
-          <.div(
-            ^.className := "answer", props.answers(2),
-          ),
-          <.div(
-            ^.className := "answer", props.answers(3),
-          )
+          props.answers.zipWithIndex.map { case (answer, index) =>
+            <.div(
+              ^.className := s"answer ${if (state.selectedAnswer.contains(index)) "selected" else ""}",
+              ^.onClick --> selectAnswer(index),
+              answer
+            )
+          }.toTagMod
         )
       )
     }
+  }
+
+  val component: Component[Props, State, Backend, CtorType.Props] = ScalaComponent.builder[Props]("Question")
+    .initialState(State())
+    .renderBackend[Backend]
     .build
 }
