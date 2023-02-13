@@ -1,10 +1,18 @@
-enablePlugins(ScalaJSPlugin)
-scalaJSUseMainModuleInitializer := true
+import org.scalajs.linker.interface.ModuleSplitStyle
 
-ThisBuild / scalaVersion := "3.2.2"
-lazy val root = (project in file("."))
+lazy val quizzical = (project in file("."))
+  .enablePlugins(ScalaJSPlugin)
   .settings(
-    name := "quizzical-quest"
+    name := "quizzical-quest",
+    scalaVersion := "3.2.2",
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.ESModule)
+        .withModuleSplitStyle(ModuleSplitStyle.SmallModulesFor(List("quizzical")))
+    }
   )
 
-libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.1.0"
+libraryDependencies ++= Seq(
+  "org.scala-js" %%% "scalajs-dom" % "2.1.0",
+  "com.github.japgolly.scalajs-react" %%% "core" % "2.1.1"
+)
