@@ -14,4 +14,5 @@ lazy val quizzical = (project in file("."))
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "2.1.0",
+  "com.github.japgolly.scalajs-react" %%% "core" % "2.1.1"
 )

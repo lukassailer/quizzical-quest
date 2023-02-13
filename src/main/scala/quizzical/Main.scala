@@ -1,12 +1,14 @@
-package quizzical
+import japgolly.scalajs.react.ScalaComponent
+import japgolly.scalajs.react.vdom.html_<^.*
+import org.scalajs.dom.document
 
-import org.scalajs.dom
+object Main {
+  val Hello =
+    ScalaComponent.builder[String]
+      .render_P(name => <.div("Hello there ", name))
+      .build
 
-@main
-def Quizzical(): Unit = {
-  dom.document.getElementById("app").innerHTML =
-    """
-    <h1>Hello Scala.js!</h1>
-    <a href="https://www.scala-js.org">Scala.js</a>
-    """
+  def main(args: Array[String]): Unit = {
+    Hello("World").renderIntoDOM(document.getElementById("app"))
+  }
 }
