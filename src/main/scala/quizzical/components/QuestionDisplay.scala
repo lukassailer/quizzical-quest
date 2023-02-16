@@ -5,7 +5,7 @@ import japgolly.scalajs.react.component.Scala.Component
 import japgolly.scalajs.react.vdom.html_<^.*
 
 object QuestionDisplay {
-  case class Props(question: String, answers: List[String])
+  case class Props(text: String, answers: List[String], correctAnswer: Int)
 
   case class State(selectedAnswer: Option[Int] = None)
 
@@ -16,12 +16,16 @@ object QuestionDisplay {
     def render(props: Props, state: State): VdomElement = {
       <.div(
         ^.className := "question-box",
-        <.p(^.className := "question", props.question),
+        <.p(^.className := "question", props.text),
         <.div(
           ^.className := "answers",
           props.answers.zipWithIndex.map { case (answer, index) =>
             <.div(
-              ^.className := s"answer ${if (state.selectedAnswer.contains(index)) "selected" else ""}",
+              ^.className := s"answer ${
+                if (state.selectedAnswer.contains(index) && props.correctAnswer == index) "correct"
+                else if (state.selectedAnswer.contains(index) && props.correctAnswer != index) "incorrect"
+                else ""
+              }",
               ^.onClick --> selectAnswer(index),
               answer
             )

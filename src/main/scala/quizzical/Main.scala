@@ -5,8 +5,7 @@ import quizzical.QuestionDisplay
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-
-case class Question(text: String, correctAnswer: String, incorrectAnswers: List[String])
+import scala.util.Random
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -16,33 +15,29 @@ object Main {
       if (response.ok) {
         response.json().toFuture.map { json =>
           val onlyQuestionObject = json.asInstanceOf[js.Array[js.Dynamic]](0)
-          val question = mapJsonToQuestion(onlyQuestionObject)
+          val question = mapJsonToQuestionProps(onlyQuestionObject)
 
-          QuestionDisplay.component(
-            QuestionDisplay.Props(
-              question.text,
-              question.correctAnswer :: question.incorrectAnswers
-            )
-          ).renderIntoDOM(dom.document.getElementById("app"))
+          QuestionDisplay.component(question).renderIntoDOM(dom.document.getElementById("app"))
         }
       } else {
         val errorMessage = s"Network Error: ${response.statusText} (${response.status})"
         dom.console.error(errorMessage)
         throw new RuntimeException(errorMessage)
       }
-    }.recover {
-      case e: Throwable =>
-        val errorMessage = s"Internal Error: ${e.getMessage}"
-        dom.console.error(errorMessage)
-        throw new RuntimeException(errorMessage)
+    }.recover { case e: Throwable =>
+      val errorMessage = s"Internal Error: ${e.getMessage}"
+      dom.console.error(errorMessage)
+      throw new RuntimeException(errorMessage)
     }
   }
 
-  private def mapJsonToQuestion(json: js.Dynamic): Question = {
-    Question(
-      text = json.question.toString,
-      correctAnswer = json.correctAnswer.asInstanceOf[String],
-      incorrectAnswers = json.incorrectAnswers.asInstanceOf[js.Array[String]].toList
-    )
+  private def mapJsonToQuestionProps(json: js.Dynamic): QuestionDisplay.Props = {
+    val text = json.question.toString
+    val correctAnswer = json.correctAnswer.asInstanceOf[String]
+    val incorrectAnswers = json.incorrectAnswers.asInstanceOf[js.Array[String]].toList
+    val answers = Random.shuffle(correctAnswer :: incorrectAnswers)
+    val correctAnswerIndex = answers.indexOf(correctAnswer)
+
+    QuestionDisplay.Props(text, answers, correctAnswerIndex)
   }
 }
