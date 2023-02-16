@@ -20,10 +20,10 @@ object Main {
       Question.Props(
         q.question.toString,
         List(
-          q.correctAnswer.toString,
-          "incorrect answer 1",
-          "incorrect answer 2",
-          "incorrect answer 3"
+          q.correctAnswer.asInstanceOf[String],
+          q.incorrectAnswers.asInstanceOf[js.Array[String]](0),
+          q.incorrectAnswers.asInstanceOf[js.Array[String]](1),
+          q.incorrectAnswers.asInstanceOf[js.Array[String]](2)
         )
       )
     ).renderIntoDOM(dom.document.getElementById("app"))
