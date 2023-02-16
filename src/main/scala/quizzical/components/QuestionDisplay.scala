@@ -4,7 +4,7 @@ import japgolly.scalajs.react.*
 import japgolly.scalajs.react.component.Scala.Component
 import japgolly.scalajs.react.vdom.html_<^.*
 
-object Question {
+object QuestionDisplay {
   case class Props(question: String, answers: List[String])
 
   case class State(selectedAnswer: Option[Int] = None)
