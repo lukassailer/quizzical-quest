@@ -1,7 +1,7 @@
 package quizzical
 
 import org.scalajs.dom
-import quizzical.QuestionDisplay
+import quizzical.components.QuestionDisplay
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js

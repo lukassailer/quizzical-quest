@@ -41,17 +41,18 @@
     background-color: lightblue;
 }
 
-.answer.selected {
-    background-color: royalblue;
-    color: white;
-}
-
 .answer.correct {
+    pointer-events: none;
     background-color: green;
     color: white;
 }
 
 .answer.incorrect {
+    pointer-events: none;
     background-color: red;
     color: white;
+}
+
+.answer.disabled {
+    pointer-events: none;
 }
