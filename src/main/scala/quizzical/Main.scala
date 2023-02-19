@@ -1,7 +1,9 @@
 package quizzical
 
+import japgolly.scalajs.react.callback.Callback
+import japgolly.scalajs.react.vdom.html_<^.<
 import org.scalajs.dom
-import quizzical.components.QuestionDisplay
+import quizzical.components.{GameOverScreen, QuestionDisplay, ScoreDisplay}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
@@ -9,25 +11,62 @@ import scala.util.Random
 
 object Main {
   def main(args: Array[String]): Unit = {
+    val initLives = 5
+    val root = dom.document.getElementById("app")
     val url = "https://the-trivia-api.com/api/questions?limit=1"
 
-    dom.fetch(url).toFuture.flatMap { response =>
-      if (response.ok) {
-        response.json().toFuture.map { json =>
-          val onlyQuestionObject = json.asInstanceOf[js.Array[js.Dynamic]](0)
-          val question = mapJsonToQuestionProps(onlyQuestionObject)
+    renderNextQuestion(0)
 
-          QuestionDisplay.component(question).renderIntoDOM(dom.document.getElementById("app"))
-        }
+    def renderNextQuestion(score: Int, lives: Int = initLives): Unit = {
+      if (lives == 0) {
+        renderGameOver(score)
       } else {
-        val errorMessage = s"Network Error: ${response.statusText} (${response.status})"
-        dom.console.error(errorMessage)
-        throw new RuntimeException(errorMessage)
+        dom.fetch(url).toFuture.flatMap { response =>
+          if (response.ok) {
+            response.json().toFuture.map { json =>
+              val onlyQuestionObject = json.asInstanceOf[js.Array[js.Dynamic]](0)
+              val questionProps = mapJsonToQuestionProps(onlyQuestionObject)
+
+              renderQuestion(questionProps, score, lives)
+            }
+          } else {
+            val errorMessage = s"Network Error: ${response.statusText} (${response.status})"
+            dom.console.error(errorMessage)
+            throw new RuntimeException(errorMessage)
+          }
+        }.recover { case e: Throwable =>
+          val errorMessage = s"Internal Error: ${e.getMessage}"
+          dom.console.error(errorMessage)
+          throw new RuntimeException(errorMessage)
+        }
       }
-    }.recover { case e: Throwable =>
-      val errorMessage = s"Internal Error: ${e.getMessage}"
-      dom.console.error(errorMessage)
-      throw new RuntimeException(errorMessage)
+    }
+
+    def renderGameOver(score: Int): Unit = {
+      GameOverScreen.render(GameOverScreen.Props(score)).renderIntoDOM(dom.document.getElementById("app"))
+    }
+
+    def renderQuestion(questionProps: QuestionDisplay.Props, score: Int, lives: Int): Unit = {
+      val onCorrectAnswer = Callback {
+        js.timers.setTimeout(5000) {
+          renderNextQuestion(score + 1, lives)
+        }
+      }
+      val onIncorrectAnswer = Callback {
+        js.timers.setTimeout(5000) {
+          renderNextQuestion(score, lives - 1)
+        }
+      }
+
+      val questionPropsWithCallbacks = questionProps.copy(
+        onCorrect = onCorrectAnswer,
+        onIncorrect = onIncorrectAnswer
+      )
+
+      <.div(
+        QuestionDisplay.component(questionPropsWithCallbacks),
+        ScoreDisplay.component(ScoreDisplay.Props(score, lives))
+      ).renderIntoDOM(root)
     }
   }
 
@@ -38,6 +77,6 @@ object Main {
     val answers = Random.shuffle(correctAnswer :: incorrectAnswers)
     val correctAnswerIndex = answers.indexOf(correctAnswer)
 
-    QuestionDisplay.Props(text, answers, correctAnswerIndex)
+    QuestionDisplay.Props(text, answers, correctAnswerIndex, Callback.empty, Callback.empty)
   }
 }

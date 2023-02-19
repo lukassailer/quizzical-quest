@@ -10,7 +10,13 @@ object QuestionDisplay {
     .renderBackend[Backend]
     .build
 
-  case class Props(text: String, answers: List[String], correctAnswer: Int)
+  case class Props(
+                    text: String,
+                    answers: List[String],
+                    correctAnswer: Int,
+                    onCorrect: Callback,
+                    onIncorrect: Callback
+                  )
 
   case class State(selectedAnswer: Option[Int] = None)
 
@@ -22,9 +28,10 @@ object QuestionDisplay {
         <.div(
           ^.className := "answers",
           props.answers.zipWithIndex.map { case (answer, index) =>
+            val mod = ^.className := answerClassName(index, state.selectedAnswer, props.correctAnswer)
             <.div(
               ^.key := index,
-              ^.className := answerClassName(index, state.selectedAnswer, props.correctAnswer),
+              mod,
               ^.onClick --> selectAnswer(index),
               answer
             )
@@ -34,7 +41,11 @@ object QuestionDisplay {
     }
 
     private def selectAnswer(index: Int): Callback =
-      $.setState(State(Some(index)))
+      $.setState(State(Some(index))).flatMap { _ =>
+        $.props.flatMap { props =>
+          if (index == props.correctAnswer) props.onCorrect else props.onIncorrect
+        }
+      }
 
     private def answerClassName(index: Int, selectedAnswer: Option[Int], correctAnswer: Int): String =
       s"answer ${
