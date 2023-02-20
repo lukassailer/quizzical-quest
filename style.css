@@ -13,14 +13,14 @@
 }
 
 .question {
-    font-size: 22px;
+    font-size: 26px;
+    height: 2em;
 }
 
 .answers {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 20px;
-    margin-top: 20px;
     width: 100%;
 }
 
@@ -31,28 +31,107 @@
     background-color: lightgray;
     border-radius: 10px;
     text-align: center;
-    font-size: 3vw;
+    font-size: 2vb;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #333;
 }
 
 .answer:hover {
-    background-color: lightblue;
+    background-color: #E6E6E6;
 }
 
 .answer.correct {
     pointer-events: none;
-    background-color: green;
+    background-color: #4CAF50;
     color: white;
 }
 
 .answer.incorrect {
     pointer-events: none;
-    background-color: red;
+    background-color: #F44336;
     color: white;
 }
 
 .answer.disabled {
     pointer-events: none;
+}
+
+.score-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #F7F7F7;
+}
+
+.score-display .lives {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.score-display .lives p {
+    margin-right: 5px;
+    color: #F44336;
+}
+
+.score-display .score {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.game-over-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000CC;
+    color: white;
+    font-family: "Helvetica Neue", sans-serif;
+    animation: fade-in 2s ease-in;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.game-over-screen h1 {
+    font-size: 5rem;
+    margin: 0 0 2rem;
+}
+
+.game-over-screen p {
+    font-size: 2rem;
+    margin: 0 0 4rem;
+}
+
+.game-over-screen button {
+    font-size: 2rem;
+    background-color: #f44336;
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.game-over-screen button:hover {
+    background-color: #982820;
 }
