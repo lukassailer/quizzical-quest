@@ -1,9 +1,9 @@
 package quizzical
 
 import japgolly.scalajs.react.callback.Callback
-import japgolly.scalajs.react.vdom.html_<^.<
+import japgolly.scalajs.react.vdom.html_<^.*
 import org.scalajs.dom
-import quizzical.components.{GameOverScreen, QuestionDisplay, ScoreDisplay}
+import quizzical.components.{GameOverScreen, LoadingQuestionDisplay, QuestionDisplay, ScoreDisplay}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
@@ -49,11 +49,19 @@ object Main {
     def renderQuestion(questionProps: QuestionDisplay.Props, score: Int, lives: Int): Unit = {
       val onCorrectAnswer = Callback {
         js.timers.setTimeout(5000) {
+          <.div(
+            LoadingQuestionDisplay.component(LoadingQuestionDisplay.Props(questionProps.text)),
+            ScoreDisplay.component(ScoreDisplay.Props(score, lives))
+          ).renderIntoDOM(root)
           renderNextQuestion(score + 1, lives)
         }
       }
       val onIncorrectAnswer = Callback {
         js.timers.setTimeout(5000) {
+          <.div(
+            LoadingQuestionDisplay.component(LoadingQuestionDisplay.Props(questionProps.text)),
+            ScoreDisplay.component(ScoreDisplay.Props(score, lives))
+          ).renderIntoDOM(root)
           renderNextQuestion(score, lives - 1)
         }
       }
@@ -77,6 +85,6 @@ object Main {
     val answers = Random.shuffle(correctAnswer :: incorrectAnswers)
     val correctAnswerIndex = answers.indexOf(correctAnswer)
 
-    QuestionDisplay.Props(text, answers, correctAnswerIndex, Callback.empty, Callback.empty)
+    QuestionDisplay.Props(text, answers, correctAnswerIndex)
   }
 }

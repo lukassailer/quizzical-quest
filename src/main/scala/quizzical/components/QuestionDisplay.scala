@@ -14,8 +14,8 @@ object QuestionDisplay {
                     text: String,
                     answers: List[String],
                     correctAnswer: Int,
-                    onCorrect: Callback,
-                    onIncorrect: Callback
+                    onCorrect: Callback = Callback.empty,
+                    onIncorrect: Callback = Callback.empty
                   )
 
   case class State(selectedAnswer: Option[Int] = None)
@@ -28,10 +28,9 @@ object QuestionDisplay {
         <.div(
           ^.className := "answers",
           props.answers.zipWithIndex.map { case (answer, index) =>
-            val mod = ^.className := answerClassName(index, state.selectedAnswer, props.correctAnswer)
             <.div(
               ^.key := index,
-              mod,
+              ^.className := answerClassName(index, state.selectedAnswer, props.correctAnswer),
               ^.onClick --> selectAnswer(index),
               answer
             )
