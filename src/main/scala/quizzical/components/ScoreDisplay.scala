@@ -4,9 +4,10 @@ import japgolly.scalajs.react.*
 import japgolly.scalajs.react.vdom.html_<^.*
 
 object ScoreDisplay {
-  val component: ScalaComponent[Props, Unit, Unit, CtorType.Props] = ScalaComponent.builder[Props]("ScoreDisplay")
-    .render_P(render)
-    .build
+  val component: ScalaComponent[Props, Unit, Unit, CtorType.Props] =
+    ScalaComponent.builder[Props]("ScoreDisplay")
+      .render_P(render)
+      .build
 
   case class Props(score: Int, lives: Int)
 

@@ -10,10 +10,12 @@ import scala.scalajs.js
 import scala.util.Random
 
 object Main {
+  private val initLives = 5
+  private val timeOutAfterAnswer = 5000
+  private val root = dom.document.getElementById("app")
+  private val url = "https://the-trivia-api.com/api/questions?limit=1"
+
   def main(args: Array[String]): Unit = {
-    val initLives = 5
-    val root = dom.document.getElementById("app")
-    val url = "https://the-trivia-api.com/api/questions?limit=1"
 
     renderNextQuestion(0)
 
@@ -43,23 +45,23 @@ object Main {
     }
 
     def renderGameOver(score: Int): Unit = {
-      GameOverScreen.render(GameOverScreen.Props(score)).renderIntoDOM(dom.document.getElementById("app"))
+      GameOverScreen.render(GameOverScreen.Props(score)).renderIntoDOM(root)
     }
 
     def renderQuestion(questionProps: QuestionDisplay.Props, score: Int, lives: Int): Unit = {
       val onCorrectAnswer = Callback {
-        js.timers.setTimeout(5000) {
+        js.timers.setTimeout(timeOutAfterAnswer) {
           <.div(
-            LoadingQuestionDisplay.component(LoadingQuestionDisplay.Props(questionProps.text)),
+            LoadingQuestionDisplay.component(LoadingQuestionDisplay.Props(questionProps.question.text)),
             ScoreDisplay.component(ScoreDisplay.Props(score, lives))
           ).renderIntoDOM(root)
           renderNextQuestion(score + 1, lives)
         }
       }
       val onIncorrectAnswer = Callback {
-        js.timers.setTimeout(5000) {
+        js.timers.setTimeout(timeOutAfterAnswer) {
           <.div(
-            LoadingQuestionDisplay.component(LoadingQuestionDisplay.Props(questionProps.text)),
+            LoadingQuestionDisplay.component(LoadingQuestionDisplay.Props(questionProps.question.text)),
             ScoreDisplay.component(ScoreDisplay.Props(score, lives))
           ).renderIntoDOM(root)
           renderNextQuestion(score, lives - 1)
@@ -82,9 +84,8 @@ object Main {
     val text = json.question.toString
     val correctAnswer = json.correctAnswer.asInstanceOf[String]
     val incorrectAnswers = json.incorrectAnswers.asInstanceOf[js.Array[String]].toList
-    val answers = Random.shuffle(correctAnswer :: incorrectAnswers)
-    val correctAnswerIndex = answers.indexOf(correctAnswer)
+    val answers = Random.shuffle(QuestionDisplay.Answer(correctAnswer, true) :: incorrectAnswers.map(QuestionDisplay.Answer(_, false)))
 
-    QuestionDisplay.Props(text, answers, correctAnswerIndex)
+    QuestionDisplay.Props(QuestionDisplay.Question(text, answers))
   }
 }

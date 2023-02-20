@@ -10,9 +10,14 @@ object LoadingQuestionDisplay {
     .build
 
   case class Props(text: String)
-  
+
   def render(props: Props): VdomElement =
     QuestionDisplay.component(
-      QuestionDisplay.Props(props.text, List("", "", "", ""), -1)
+      QuestionDisplay.Props(
+        QuestionDisplay.Question(
+          props.text,
+          List.fill(4)(QuestionDisplay.Answer("\uD83D\uDD2E", false))
+        )
+      )
     )
 }
